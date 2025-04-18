@@ -31,11 +31,7 @@ apt-get install -y -o Dpkg::Options::="--force-confnew" git cmake curl || { echo
 # 🧠 Clone llama.cpp
 # -----------------------------
 echo "🔁 Cloning llama.cpp..."
-if [ -d "llama.cpp" ]; then
-    echo "⚠️  llama.cpp already exists. Skipping clone."
-else
-    git clone https://github.com/ggml-org/llama.cpp || { echo "❌ Failed to clone llama.cpp"; exit 1; }
-fi
+git clone https://github.com/ggml-org/llama.cpp || { echo "❌ Failed to clone llama.cpp"; exit 1; }
 
 cd llama.cpp || { echo "❌ Failed to enter llama.cpp directory"; exit 1; }
 
@@ -68,10 +64,7 @@ chmod +x ~/.termux/gemma
 # -----------------------------
 # 🔧 Add to PATH (if not already)
 # -----------------------------
-if ! grep -q 'export PATH=$PATH:~/.termux' ~/.bashrc; then
-    echo 'export PATH=$PATH:~/.termux' >> ~/.bashrc
-fi
-
+echo 'export PATH=$PATH:~/.termux' >> ~/.bashrc
 source ~/.bashrc || true
 
 echo "✅ Setup complete! Run the model with: gemma"
