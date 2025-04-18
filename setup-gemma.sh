@@ -53,7 +53,7 @@ chmod +x "$HOME/.termux/gemma"
 
 # 🔧 Add launcher to PATH (idempotent)
 echo 'export PATH=$PATH:~/.termux' >> "$HOME/.bashrc"
-source ~/.bashrc
+source "$HOME/.bashrc"
 
 # Final message
 echo "✅ Setup complete! Run the model anytime with: gemma"
