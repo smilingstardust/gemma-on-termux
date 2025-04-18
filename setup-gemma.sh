@@ -1,11 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-if ! command -v pv &> /dev/null; then
-    echo "pv could not be found, installing..."
-    pkg install pv -y
-else
-    echo "pv is already installed."
-fi
+pkg install pv -y
+
 
 set -eo pipefail
 
