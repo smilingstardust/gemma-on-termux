@@ -4,7 +4,7 @@ set -eo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Logging everything for debugging if needed
+# Logging only script's output
 exec > >(tee -a ~/setup-gemma-install.log) 2>&1
 
 # -----------------------------
@@ -18,20 +18,26 @@ cd ~/setup-gemma || { echo "❌ Failed to enter setup-gemma directory"; exit 1; 
 # 🔄 Update and upgrade
 # -----------------------------
 echo "🔄 Updating and upgrading packages..."
-apt-get update
-apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" || echo "⚠️  Some packages were held back or had minor warnings."
+{
+    apt-get update
+    apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+} | pv -p -t -e -b > /dev/null || echo "⚠️  Some packages were held back or had minor warnings."
 
 # -----------------------------
 # 📥 Install required packages
 # -----------------------------
 echo "📦 Installing dependencies..."
-apt-get install -y -o Dpkg::Options::="--force-confnew" git cmake curl || { echo "❌ Package install failed"; exit 1; }
+{
+    apt-get install -y -o Dpkg::Options::="--force-confnew" git cmake curl
+} | pv -p -t -e -b > /dev/null || { echo "❌ Package install failed"; exit 1; }
 
 # -----------------------------
 # 🧠 Clone llama.cpp
 # -----------------------------
 echo "🔁 Cloning llama.cpp..."
-git clone https://github.com/ggml-org/llama.cpp || { echo "❌ Failed to clone llama.cpp"; exit 1; }
+{
+    git clone https://github.com/ggml-org/llama.cpp
+} | pv -p -t -e -b > /dev/null || { echo "❌ Failed to clone llama.cpp"; exit 1; }
 
 cd llama.cpp || { echo "❌ Failed to enter llama.cpp directory"; exit 1; }
 
@@ -39,14 +45,16 @@ cd llama.cpp || { echo "❌ Failed to enter llama.cpp directory"; exit 1; }
 # ⚙️ Build project
 # -----------------------------
 echo "⚙️ Building llama.cpp..."
-cmake -B build -DGGML_CPU_KLEIDIAI=ON || { echo "❌ cmake config failed"; exit 1; }
-cmake --build build --config Release || { echo "❌ Build failed"; exit 1; }
+{
+    cmake -B build -DGGML_CPU_KLEIDIAI=ON
+    cmake --build build --config Release
+} | pv -p -t -e -b > /dev/null || { echo "❌ Build failed"; exit 1; }
 
 # -----------------------------
-# ⬇️ Download model
+# ⬇️ Download model with progress bar and ETA
 # -----------------------------
 echo "⬇️ Downloading Gemma model..."
-curl -L https://huggingface.co/AsmitPS/gemma3-1b-it-Q4_K_M-gguf/resolve/main/google_gemma-3-1b-it-Q4_K_M.gguf -o ~/setup-gemma/gemma3.gguf || { echo "❌ Model download failed"; exit 1; }
+curl -L https://huggingface.co/AsmitPS/gemma3-1b-it-Q4_K_M-gguf/resolve/main/google_gemma-3-1b-it-Q4_K_M.gguf -o ~/setup-gemma/gemma3.gguf --progress-bar || { echo "❌ Model download failed"; exit 1; }
 
 # -----------------------------
 # 🚀 Create launcher script
