@@ -34,7 +34,7 @@ git clone https://github.com/ggml-org/llama.cpp --quiet >/dev/null 2>&1
 echo "[6/7] Building llama.cpp..."
 cd llama.cpp
 cmake -B build -DGGML_CPU_KLEIDIAI=ON >/dev/null 2>&1
-cmake --build build --config Release >/dev/null 2>&1
+cmake --build build --config Release -j 8 >/dev/null 2>&1
 
 # 7️⃣ Step 7/7: Download Gemma model with one-line progress bar
 echo "[7/7] Downloading Gemma model..."
