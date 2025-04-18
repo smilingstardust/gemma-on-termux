@@ -47,7 +47,7 @@ echo "Creating launcher script..."
 mkdir -p "$HOME/.termux"
 cat > "$HOME/.termux/gemma" << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
-"$HOME/setup-gemma/llama.cpp/build/bin/llama-cli" -m "$HOME/setup-gemma/gemma3.gguf" -c 4096 > /dev/null 2>&1
+"$HOME/setup-gemma/llama.cpp/build/bin/llama-cli" -m "$HOME/setup-gemma/gemma3.gguf" -c 4096 --no-warmup 2>/dev/null
 EOF
 chmod +x "$HOME/.termux/gemma"
 
