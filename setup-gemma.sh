@@ -1,8 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/bash
+export DEBIAN_FRONTEND=noninteractive
 # Update and upgrade packages
 apt update && apt upgrade -y
 # Install necessary packages
-apt install git cmake -y
+apt install -y -o Dpkg::Options::="--force-confnew" git cmake
 # Clone the llama.cpp repository
 git clone https://github.com/ggml-org/llama.cpp
 cd llama.cpp
