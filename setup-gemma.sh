@@ -1,7 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-set -e  # Stop on first error unless handled
-set -o pipefail
+set -eo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -9,7 +8,7 @@ export DEBIAN_FRONTEND=noninteractive
 exec > >(tee -a ~/setup-gemma-install.log) 2>&1
 
 # -----------------------------
-# 📦 Create isolated directory
+# 📂 Create isolated directory
 # -----------------------------
 echo "📂 Creating setup-gemma directory..."
 mkdir -p ~/setup-gemma
@@ -19,13 +18,14 @@ cd ~/setup-gemma || { echo "❌ Failed to enter setup-gemma directory"; exit 1; 
 # 🔄 Update and upgrade
 # -----------------------------
 echo "🔄 Updating and upgrading packages..."
-apt update && apt upgrade -y || echo "⚠️  Upgrade finished with warnings"
+apt-get update
+apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" || echo "⚠️  Some packages were held back or had minor warnings."
 
 # -----------------------------
 # 📥 Install required packages
 # -----------------------------
 echo "📦 Installing dependencies..."
-apt install -y -o Dpkg::Options::="--force-confnew" git cmake curl || { echo "❌ Package install failed"; exit 1; }
+apt-get install -y -o Dpkg::Options::="--force-confnew" git cmake curl || { echo "❌ Package install failed"; exit 1; }
 
 # -----------------------------
 # 🧠 Clone llama.cpp
@@ -72,6 +72,6 @@ if ! grep -q 'export PATH=$PATH:~/.termux' ~/.bashrc; then
     echo 'export PATH=$PATH:~/.termux' >> ~/.bashrc
 fi
 
-source ~/.bashrc
+source ~/.bashrc || true
 
 echo "✅ Setup complete! Run the model with: gemma"
