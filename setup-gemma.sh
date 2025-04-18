@@ -21,14 +21,14 @@ apt-get update -y >/dev/null 2>&1 || true
 echo "[3/7] Upgrading installed packages..."
 apt-get upgrade -y -o Dpkg::Options::="--force-confnew" >/dev/null 2>&1 || true
 
-# 4️⃣ Step 4/7: Install dependencies
-echo "[4/7] Installing dependencies (git, cmake, curl)..."
-apt-get install -y git cmake curl >/dev/null 2>&1
+# 4️⃣ Step 4/7: Install dependencies (git, cmake, curl, wget)
+echo "[4/7] Installing dependencies (git, cmake, curl, wget)..."
+apt-get install -y git cmake curl wget >/dev/null 2>&1
 
 # 5️⃣ Step 5/7: Clone llama.cpp repository
 echo "[5/7] Cloning llama.cpp..."
 rm -rf llama.cpp
-git clone https://github.com/ggml-org/llama.cpp --progress >/dev/null 2>&1
+git clone https://github.com/ggml-org/llama.cpp --quiet >/dev/null 2>&1
 
 # 6️⃣ Step 6/7: Build llama.cpp
 echo "[6/7] Building llama.cpp..."
@@ -36,18 +36,18 @@ cd llama.cpp
 cmake -B build -DGGML_CPU_KLEIDIAI=ON >/dev/null 2>&1
 cmake --build build --config Release >/dev/null 2>&1
 
-# 7️⃣ Step 7/7: Download Gemma model with progress bar
+# 7️⃣ Step 7/7: Download Gemma model with one-line progress bar
 echo "[7/7] Downloading Gemma model..."
-curl -L --progress-bar \
-  https://huggingface.co/AsmitPS/gemma3-1b-it-Q4_K_M-gguf/resolve/main/google_gemma-3-1b-it-Q4_K_M.gguf \
-  -o "$HOME/setup-gemma/gemma3.gguf"
+wget --quiet --show-progress --progress=bar:force:noscroll \
+  -O "$HOME/setup-gemma/gemma3.gguf" \
+  https://huggingface.co/AsmitPS/gemma3-1b-it-Q4_K_M-gguf/resolve/main/google_gemma-3-1b-it-Q4_K_M.gguf
 
 # 🚀 Create launcher script
 echo "Creating launcher script..."
 mkdir -p "$HOME/.termux"
 cat > "$HOME/.termux/gemma" << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
-"$HOME/setup-gemma/llama.cpp/build/bin/llama-cli" -m "$HOME/setup-gemma/gemma3.gguf" > /dev/null 2>&1
+"$HOME/setup-gemma/llama.cpp/build/bin/llama-cli" -m "$HOME/setup-gemma/gemma3.gguf"
 EOF
 chmod +x "$HOME/.termux/gemma"
 
